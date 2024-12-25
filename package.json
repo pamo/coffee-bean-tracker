@@ -1,0 +1,30 @@
+{
+  "name": "coffee-bean-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm run install:web && npm run install:backend && npm run install:cdk",
+    "install:web": "cd web && npm install",
+    "install:backend": "cd infrastructure/backend && npm install",
+    "install:cdk": "cd infrastructure/cdk && npm install",
+    "build:web": "cd web && npm run build",
+    "build:backend": "cd infrastructure/backend && npm run build",
+    "build:cdk": "cd infrastructure/cdk && npm run build",
+    "build": "npm run build:web && npm run build:backend && npm run build:cdk",
+    "deploy:web": "cd web && npm run build && aws s3 sync dist/ s3://your-bucket-name/ --delete",
+    "deploy:invalidate": "aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths \"/*\"",
+    "deploy:infrastructure": "cd infrastructure/cdk && npm run deploy",
+    "deploy": "npm run build && npm run deploy:infrastructure && npm run deploy:web && npm run deploy:invalidate",
+    "dev:web": "cd web && npm run dev"
+  },
+  "workspaces": [
+    "web",
+    "infrastructure/backend",
+    "infrastructure/cdk"
+  ],
+  "dependencies": {
+    "aws-cdk-lib": "^2.173.2",
+    "aws-sdk": "^2.1692.0",
+    "constructs": "^10.4.2"
+  }
+}
