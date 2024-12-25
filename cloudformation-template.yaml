@@ -1,0 +1,163 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  ### S3 Bucket for Web App ###
+  CoffeeAppBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+
+  ### CloudFront Distribution ###
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt CoffeeAppBucket.DomainName
+            Id: CoffeeAppOrigin
+            S3OriginConfig: {}
+        Enabled: true
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: CoffeeAppOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+  ### DynamoDB Table ###
+  CoffeeDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CoffeeBeans
+      AttributeDefinitions:
+        - AttributeName: BeanId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: BeanId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  ### API Gateway ###
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: CoffeeAppAPI
+
+  ApiResourceBeans:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: beans
+      RestApiId: !Ref ApiGateway
+
+  ApiMethodAddBean:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiResourceBeans
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - arn:aws:apigateway:${Region}:lambda:path/2015-03-31/functions/${LambdaFunctionAddBean.Arn}/invocations
+          - { Region: !Ref "AWS::Region" }
+
+  ### Lambda for Adding Beans ###
+  LambdaFunctionAddBean:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: AddCoffeeBean
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          const dynamo = new AWS.DynamoDB.DocumentClient();
+
+          exports.handler = async (event) => {
+              const data = JSON.parse(event.body);
+
+              // Validate roastDate if provided
+              if (data.roastDate && isNaN(Date.parse(data.roastDate))) {
+                  return {
+                      statusCode: 400,
+                      body: JSON.stringify({ message: "Invalid roastDate format" })
+                  };
+              }
+
+              const params = {
+                  TableName: 'CoffeeBeans',
+                  Item: {
+                      BeanId: `${Date.now()}`,
+                      Name: data.name,
+                      Roaster: data.roaster,
+                      RoastDate: data.roastDate || null, // Optional field
+                      DateAdded: new Date().toISOString()
+                  }
+              };
+              await dynamo.put(params).promise();
+              return {
+                  statusCode: 200,
+                  body: JSON.stringify({ message: 'Bean added successfully!' })
+              };
+          };
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+  ### Lambda for Summary ###
+  LambdaFunctionGetSummary:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GetCoffeeSummary
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          const dynamo = new AWS.DynamoDB.DocumentClient();
+
+          exports.handler = async (event) => {
+              const params = {
+                  TableName: 'CoffeeBeans',
+              };
+              const result = await dynamo.scan(params).promise();
+              return {
+                  statusCode: 200,
+                  body: JSON.stringify(result.Items)
+              };
+          };
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+  ### Lambda Execution Role ###
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CoffeeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:Scan
+                Resource: !GetAtt CoffeeDataTable.Arn
