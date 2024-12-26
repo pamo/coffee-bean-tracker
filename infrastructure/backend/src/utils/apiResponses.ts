@@ -1,4 +1,6 @@
-export const createResponse = (statusCode: number, body: any) => {
+export const createResponse = (statusCode: number, body: any, error?: Error) => {
+	const responseBody = error ? { ...body, error: error.message } : body;
+
 	return {
 		statusCode,
 		headers: {
@@ -6,7 +8,7 @@ export const createResponse = (statusCode: number, body: any) => {
 			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Credentials': true,
 		},
-		body: JSON.stringify(body)
+		body: JSON.stringify(responseBody)
 	};
 };
 

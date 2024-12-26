@@ -6,7 +6,9 @@ import {
 	QueryCommand,
 	PutCommandInput,
 	ScanCommandInput,
-	QueryCommandInput
+	QueryCommandInput,
+	GetCommandInput,
+	GetCommand
 } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({});
@@ -29,6 +31,9 @@ export const dynamoDb = {
 	},
 	query: async (params: QueryCommandInput) => {
 		return docClient.send(new QueryCommand(params));
+	},
+	get: async (params: GetCommandInput) => {
+		return docClient.send(new GetCommand(params));
 	}
 };
 

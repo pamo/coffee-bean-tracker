@@ -1,23 +1,8 @@
-import { APIGatewayProxyEvent } from 'aws-lambda';
 import { handler } from '../handlers/addEntry';
 import { dynamoDb } from '../utils/dynamodb';
+import { createEvent } from './utils';
 
 jest.mock('../utils/dynamodb');
-
-const createEvent = (body: any): APIGatewayProxyEvent => ({
-	body: JSON.stringify(body),
-	headers: {},
-	multiValueHeaders: {},
-	httpMethod: 'POST',
-	isBase64Encoded: false,
-	path: '',
-	pathParameters: null,
-	queryStringParameters: null,
-	multiValueQueryStringParameters: null,
-	stageVariables: null,
-	requestContext: {} as any,
-	resource: '',
-});
 
 describe('addEntry handler', () => {
 	beforeEach(() => {

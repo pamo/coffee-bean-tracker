@@ -1,54 +1,37 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
-import { dynamoDb, CoffeeBean } from '../utils/dynamodb';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { dynamoDb } from '../utils/dynamodb';
 import { createResponse } from '../utils/apiResponses';
 
-interface CoffeeSummary {
-	totalBeans: number;
-	roasterCounts: { [key: string]: number };
-	recentBeans: CoffeeBean[];
-	averageBeansPerMonth: number;
-}
-
-export const handler: APIGatewayProxyHandler = async (event) => {
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 	try {
-		const result = await dynamoDb.scan({
-			TableName: process.env.TABLE_NAME!
-		});
-
-		const items = result.Items as CoffeeBean[];
-
-		// Calculate summary statistics
-		const summary: CoffeeSummary = {
-			totalBeans: items.length,
-			roasterCounts: {},
-			recentBeans: items
-				.sort((a, b) => b.DateAdded.localeCompare(a.DateAdded))
-				.slice(0, 5),
-			averageBeansPerMonth: 0
+		const params = {
+			TableName: process.env.TABLE_NAME!,
 		};
 
-		// Calculate roaster counts
-		items.forEach(bean => {
-			summary.roasterCounts[bean.Roaster] =
-				(summary.roasterCounts[bean.Roaster] || 0) + 1;
-		});
+		const result = await dynamoDb.scan(params);
+		const items = result.Items || [];
 
-		// Calculate average beans per month
+		const summary = {
+			totalBeans: items.length,
+			roasters: [...new Set(items.map((item: any) => item.Roaster))],
+			recentBeans: items.sort((a: any, b: any) => new Date(b.DateAdded).getTime() - new Date(a.DateAdded).getTime()).slice(0, 5),
+			averageBeansPerMonth: 0,
+		};
+
 		if (items.length > 0) {
-			const oldestDate = new Date(Math.min(...items.map(b =>
-				new Date(b.DateAdded).getTime()
-			)));
-			const monthsDiff = Math.max(1,
-				(new Date().getTime() - oldestDate.getTime()) / (1000 * 60 * 60 * 24 * 30)
-			);
+			const firstDate = new Date(items[items.length - 1].DateAdded);
+			const lastDate = new Date(items[0].DateAdded);
+			const monthsDiff = (lastDate.getFullYear() - firstDate.getFullYear()) * 12 + lastDate.getMonth() - firstDate.getMonth() + 1;
 			summary.averageBeansPerMonth = items.length / monthsDiff;
 		}
 
-		return createResponse(200, summary);
+		return createResponse(200, { summary });
 	} catch (error) {
-		console.error('Error fetching summary:', error);
-		return createResponse(500, {
-			message: 'Error fetching coffee summary'
-		});
+		const message = 'Error Fetching Summary';
+		if (error instanceof Error) {
+			return createResponse(500, { message }, error);
+		} else {
+			return createResponse(500, { message, error: String(error) });
+		}
 	}
 };
