@@ -6,7 +6,12 @@
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "start:local": "sam local start-api -t template.yaml",
+    "setup-local-db": "ts-node scripts/setup-local-dynamodb.ts",
+    "start-local-db": "docker-compose up -d",
+    "create-docker-network": "docker network create lambda-local || true",
+    "prestart:local": "npm run build && npm run create-docker-network && npm run start-local-db && npm run setup-local-db",
+    "start:local": "sam local start-api -t template.yaml --warm-containers EAGER --docker-network lambda-local",
+    "stop-local-db": "docker-compose down",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {

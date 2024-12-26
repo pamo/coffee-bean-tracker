@@ -11,7 +11,16 @@ import {
 	GetCommand
 } from '@aws-sdk/lib-dynamodb';
 
-const client = new DynamoDBClient({});
+const isLocal = process.env.AWS_SAM_LOCAL === 'true';
+
+const client = new DynamoDBClient(isLocal ? {
+	endpoint: process.env.DYNAMODB_ENDPOINT,
+	region: 'local',
+	credentials: {
+		accessKeyId: 'LOCAL',
+		secretAccessKey: 'LOCAL'
+	}
+} : {});
 const docClient = DynamoDBDocumentClient.from(client);
 
 export interface CoffeeBean {

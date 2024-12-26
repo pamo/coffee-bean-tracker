@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  AddEntryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/addEntry.handler
+      Runtime: nodejs18.x
+      CodeUri: ./dist
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref CoffeeTable
+          DYNAMODB_ENDPOINT: 'http://dynamodb-local:8000'
+      Events:
+        AddEntryApi:
+          Type: Api
+          Properties:
+            Path: /beans
+            Method: post
+
+  FetchBeanDetailsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/fetchBeanDetails.handler
+      Runtime: nodejs18.x
+      CodeUri: ./dist
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref CoffeeTable
+          DYNAMODB_ENDPOINT: 'http://dynamodb-local:8000'
+      Events:
+        FetchBeanDetailsApi:
+          Type: Api
+          Properties:
+            Path: /beans/{beanId}
+            Method: get
+
+  FetchSummaryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/fetchSummary.handler
+      Runtime: nodejs18.x
+      CodeUri: ./dist
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref CoffeeTable
+          DYNAMODB_ENDPOINT: 'http://dynamodb-local:8000'
+      Events:
+        FetchSummaryApi:
+          Type: Api
+          Properties:
+            Path: /summary
+            Method: get
+
+  CoffeeTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CoffeeTable
+      AttributeDefinitions:
+        - AttributeName: BeanId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: BeanId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
