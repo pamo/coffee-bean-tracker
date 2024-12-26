@@ -1,12 +1,23 @@
+import { APIGatewayProxyEvent } from 'aws-lambda';
 import { handler } from '../handlers/addEntry';
 import { dynamoDb } from '../utils/dynamodb';
 
-// Mock DynamoDB client
-jest.mock('../utils/dynamodb', () => ({
-	dynamoDb: {
-		put: jest.fn()
-	}
-}));
+jest.mock('../utils/dynamodb');
+
+const createEvent = (body: any): APIGatewayProxyEvent => ({
+	body: JSON.stringify(body),
+	headers: {},
+	multiValueHeaders: {},
+	httpMethod: 'POST',
+	isBase64Encoded: false,
+	path: '',
+	pathParameters: null,
+	queryStringParameters: null,
+	multiValueQueryStringParameters: null,
+	stageVariables: null,
+	requestContext: {} as any,
+	resource: '',
+});
 
 describe('addEntry handler', () => {
 	beforeEach(() => {
@@ -15,33 +26,31 @@ describe('addEntry handler', () => {
 	});
 
 	it('should add a new coffee bean', async () => {
-		const event = {
-			body: JSON.stringify({
-				name: 'Test Bean',
-				roaster: 'Test Roaster',
-				roastDate: '2024-01-01'
-			})
-		};
+		const event = createEvent({
+			name: 'Test Bean',
+			roaster: 'Test Roaster',
+			roastDate: '2024-01-01'
+		});
 
-		const response = await handler(event as any, {} as any, {} as any);
+		(dynamoDb.put as jest.Mock).mockResolvedValue({});
 
-		expect(response.statusCode).toBe(200);
+		const response = await handler(event, {} as any, {} as any);
+
+		expect(response?.statusCode).toBe(200);
 		expect(dynamoDb.put).toHaveBeenCalled();
-		expect(JSON.parse(response.body).message).toBe('Bean added successfully!');
+		expect(JSON.parse(response?.body || '').message).toBe('Bean added successfully!');
 	});
 
 	it('should reject invalid roast date', async () => {
-		const event = {
-			body: JSON.stringify({
-				name: 'Test Bean',
-				roaster: 'Test Roaster',
-				roastDate: 'invalid-date'
-			})
-		};
+		const event = createEvent({
+			name: 'Test Bean',
+			roaster: 'Test Roaster',
+			roastDate: 'invalid-date'
+		});
 
-		const response = await handler(event as any, {} as any, {} as any);
+		const response = await handler(event, {} as any, {} as any);
 
-		expect(response.statusCode).toBe(400);
-		expect(JSON.parse(response.body).message).toBe('Invalid roastDate format');
+		expect(response?.statusCode).toBe(400);
+		expect(JSON.parse(response?.body || '').message).toBe('Invalid roastDate format');
 	});
 });
