@@ -1,8 +1,12 @@
-import { handler } from '../handlers/addEntry';
-import { dynamoDb } from '../utils/dynamodb';
+import { handler } from '../src/handlers/addEntry';
+import { dynamoDb } from '../src/utils/dynamodb';
 import { createEvent } from './utils';
 
-jest.mock('../utils/dynamodb');
+jest.mock('../src/utils/dynamodb', () => ({
+	dynamoDb: {
+		put: jest.fn(),
+	},
+}));
 
 describe('addEntry handler', () => {
 	beforeEach(() => {

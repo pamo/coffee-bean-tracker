@@ -1,8 +1,12 @@
-import { handler } from '../handlers/fetchBeanDetails';
-import { dynamoDb } from '../utils/dynamodb';
+import { handler } from '../src/handlers/fetchBeanDetails';
+import { dynamoDb } from '../src/utils/dynamodb';
 import { createEvent } from './utils';
 
-jest.mock('../utils/dynamodb');
+jest.mock('../src/utils/dynamodb', () => ({
+	dynamoDb: {
+		get: jest.fn(),
+	},
+}));
 
 describe('fetchBeanDetails handler', () => {
 	beforeEach(() => {

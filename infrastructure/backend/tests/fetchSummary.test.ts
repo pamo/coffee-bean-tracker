@@ -1,8 +1,12 @@
-import { handler } from '../handlers/fetchSummary';
-import { dynamoDb } from '../utils/dynamodb';
+import { handler } from '../src/handlers/fetchSummary';
+import { dynamoDb } from '../src/utils/dynamodb';
 import { createEvent } from './utils';
 
-jest.mock('../utils/dynamodb');
+jest.mock('../src/utils/dynamodb', () => ({
+	dynamoDb: {
+		scan: jest.fn(),
+	},
+}));
 
 describe('fetchSummary handler', () => {
 	beforeEach(() => {
