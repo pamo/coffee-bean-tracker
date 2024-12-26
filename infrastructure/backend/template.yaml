@@ -35,6 +35,40 @@ Resources:
             Path: /beans/{beanId}
             Method: get
 
+  UpdateBeanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/updateEntry.handler
+      Runtime: nodejs18.x
+      CodeUri: ./dist
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref CoffeeTable
+          DYNAMODB_ENDPOINT: 'http://dynamodb-local:8000'
+      Events:
+        UpdateBeanApi:
+          Type: Api
+          Properties:
+            Path: /beans/{beanId}
+            Method: put
+
+  DeleteBeanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/deleteEntry.handler
+      Runtime: nodejs18.x
+      CodeUri: ./dist
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref CoffeeTable
+          DYNAMODB_ENDPOINT: 'http://dynamodb-local:8000'
+      Events:
+        DeleteBeanApi:
+          Type: Api
+          Properties:
+            Path: /beans/{beanId}
+            Method: delete
+
   FetchSummaryFunction:
     Type: AWS::Serverless::Function
     Properties:

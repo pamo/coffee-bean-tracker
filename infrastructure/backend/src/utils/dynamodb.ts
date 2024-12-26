@@ -1,4 +1,4 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, UpdateItemCommand, UpdateItemCommandInput } from '@aws-sdk/client-dynamodb';
 import {
 	DynamoDBDocumentClient,
 	PutCommand,
@@ -8,7 +8,11 @@ import {
 	ScanCommandInput,
 	QueryCommandInput,
 	GetCommandInput,
-	GetCommand
+	GetCommand,
+	UpdateCommandInput,
+	UpdateCommand,
+	DeleteCommandInput,
+	DeleteCommand
 } from '@aws-sdk/lib-dynamodb';
 
 const isLocal = process.env.AWS_SAM_LOCAL === 'true';
@@ -43,6 +47,12 @@ export const dynamoDb = {
 	},
 	get: async (params: GetCommandInput) => {
 		return docClient.send(new GetCommand(params));
+	},
+	update: async (params: UpdateCommandInput) => {
+		return docClient.send(new UpdateCommand(params));
+	},
+	delete: async (params: DeleteCommandInput) => {
+		return docClient.send(new DeleteCommand(params));
 	}
 };
 

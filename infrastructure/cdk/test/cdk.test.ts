@@ -1,17 +1,55 @@
-// import * as cdk from 'aws-cdk-lib';
-// import { Template } from 'aws-cdk-lib/assertions';
-// import * as Cdk from '../lib/cdk-stack';
+import * as cdk from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { ApiStack } from '../lib/api-stack';
 
-// example test. To run these tests, uncomment this file along with the
-// example resource in lib/cdk-stack.ts
-test('SQS Queue Created', () => {
-//   const app = new cdk.App();
-//     // WHEN
-//   const stack = new Cdk.CdkStack(app, 'MyTestStack');
-//     // THEN
-//   const template = Template.fromStack(stack);
+test('DynamoDB Table Created', () => {
+	const app = new cdk.App();
+	const stack = new ApiStack(app, 'MyTestStack');
+	const template = Template.fromStack(stack);
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   });
+	template.hasResourceProperties('AWS::DynamoDB::Table', {
+		TableName: 'CoffeeBeans',
+		BillingMode: 'PAY_PER_REQUEST',
+		KeySchema: [
+			{
+				AttributeName: 'BeanId',
+				KeyType: 'HASH',
+			},
+		],
+		AttributeDefinitions: [
+			{
+				AttributeName: 'BeanId',
+				AttributeType: 'S',
+			},
+		],
+	});
+});
+
+test('AddBeanFunction Lambda Created', () => {
+	const app = new cdk.App();
+	const stack = new ApiStack(app, 'MyTestStack');
+	const template = Template.fromStack(stack);
+
+	template.hasResourceProperties('AWS::Lambda::Function', {
+		Handler: 'handler',
+		Runtime: 'nodejs18.x',
+		Environment: {
+			Variables: {
+				TABLE_NAME: 'CoffeeBeans',
+			},
+		},
+	});
+});
+
+test('API Gateway Created', () => {
+	const app = new cdk.App();
+	const stack = new ApiStack(app, 'MyTestStack');
+	const template = Template.fromStack(stack);
+
+	template.hasResourceProperties('AWS::ApiGateway::RestApi', {
+		Name: 'CoffeeAppAPI',
+	});
+
+	template.resourceCountIs('AWS::ApiGateway::Resource', 3); // Root, /beans, /beans/{beanId}
+	template.resourceCountIs('AWS::ApiGateway::Method', 5); // POST /beans, GET /beans, GET /beans/{beanId}, PUT /beans/{beanId}, DELETE /beans/{beanId}
 });
