@@ -28,6 +28,15 @@ export class ApiStack extends cdk.Stack {
 			},
 		});
 
+		const fetchBeanDetailsFunction = new NodejsFunction(this, 'FetchBeanDetailsFunction', {
+			runtime: lambda.Runtime.NODEJS_18_X,
+			entry: path.join(__dirname, '../../backend/src/handlers/fetchBeanDetails.ts'),
+			handler: 'handler',
+			environment: {
+				TABLE_NAME: coffeeTable.tableName,
+			},
+		});
+
 		const getSummaryFunction = new NodejsFunction(this, 'GetSummaryFunction', {
 			runtime: lambda.Runtime.NODEJS_18_X,
 			entry: path.join(__dirname, '../../backend/src/handlers/fetchSummary.ts'),
@@ -39,6 +48,7 @@ export class ApiStack extends cdk.Stack {
 
 		// Grant DynamoDB permissions
 		coffeeTable.grantWriteData(addBeanFunction);
+		coffeeTable.grantReadData(fetchBeanDetailsFunction);
 		coffeeTable.grantReadData(getSummaryFunction);
 
 		// API Gateway
@@ -53,5 +63,8 @@ export class ApiStack extends cdk.Stack {
 		const beansResource = api.root.addResource('beans');
 		beansResource.addMethod('POST', new apigateway.LambdaIntegration(addBeanFunction));
 		beansResource.addMethod('GET', new apigateway.LambdaIntegration(getSummaryFunction));
+
+		const beanResource = beansResource.addResource('{beanId}');
+		beanResource.addMethod('GET', new apigateway.LambdaIntegration(fetchBeanDetailsFunction));
 	}
 }

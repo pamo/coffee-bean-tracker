@@ -49,7 +49,7 @@ Resources:
         FetchSummaryApi:
           Type: Api
           Properties:
-            Path: /summary
+            Path: /beans
             Method: get
 
   CoffeeTable:
