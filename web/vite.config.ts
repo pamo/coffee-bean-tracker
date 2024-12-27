@@ -24,12 +24,23 @@ export default defineConfig(({ command }) => {
       },
       proxy: !isProduction
         ? {
-            '/api': {
-              target: 'http://localhost:3000',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\/api/, ''),
+          '/api': {
+            target: 'http://127.0.0.1:3000',
+            changeOrigin: true,
+            rewrite: (path) => {
+              console.log(`Rewriting path: ${path}`);
+              return path.replace(/^\/api/, '');
             },
-          }
+            configure: (proxy, options) => {
+              proxy.on('proxyReq', (proxyReq, req, res) => {
+                console.log(`Proxying request to: ${proxyReq.path}`);
+              });
+              proxy.on('error', (err, req, res) => {
+                console.error('Proxy error:', err);
+              });
+            },
+          },
+        }
         : undefined,
     },
   };
