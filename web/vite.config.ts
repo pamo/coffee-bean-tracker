@@ -1,19 +1,27 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { fileURLToPath, URL } from 'url';
-import path from 'path';
+import { fileURLToPath, URL } from 'node:url'
 
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+
+// https://vite.dev/config/
 export default defineConfig(({ command }) => {
   const isProduction = command === 'build';
 
   return {
-    plugins: [vue()],
+    plugins: [vue(), vueDevTools()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
+    build: {
+      outDir: 'dist',
+    },
     server: {
+      headers: {
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
+      },
       proxy: !isProduction
         ? {
             '/api': {
