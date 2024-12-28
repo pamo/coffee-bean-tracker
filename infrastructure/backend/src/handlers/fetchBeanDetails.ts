@@ -13,7 +13,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 	try {
 		const params = {
 			TableName: process.env.TABLE_NAME!,
-			Key: { BeanId: beanId },
+			Key: { beanId },
 		};
 
 		const result = await dynamoDb.get(params);

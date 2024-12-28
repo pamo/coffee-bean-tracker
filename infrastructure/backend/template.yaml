@@ -91,10 +91,10 @@ Resources:
     Properties:
       TableName: CoffeeTable
       AttributeDefinitions:
-        - AttributeName: BeanId
+        - AttributeName: beanId
           AttributeType: S
       KeySchema:
-        - AttributeName: BeanId
+        - AttributeName: beanId
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5

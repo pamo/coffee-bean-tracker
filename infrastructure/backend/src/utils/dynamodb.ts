@@ -28,11 +28,11 @@ const client = new DynamoDBClient(isLocal ? {
 const docClient = DynamoDBDocumentClient.from(client);
 
 export interface CoffeeBean {
-	BeanId: string;
-	Name: string;
-	Roaster: string;
-	RoastDate?: string;
-	DateAdded: string;
+	beanId: string;
+	name: string;
+	roaster: string;
+	roastDate?: string;
+	dateAdded: string;
 }
 
 export const dynamoDb = {

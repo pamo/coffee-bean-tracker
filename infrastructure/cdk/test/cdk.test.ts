@@ -12,13 +12,13 @@ test('DynamoDB Table Created', () => {
 		BillingMode: 'PAY_PER_REQUEST',
 		KeySchema: [
 			{
-				AttributeName: 'BeanId',
+				AttributeName: 'beanId',
 				KeyType: 'HASH',
 			},
 		],
 		AttributeDefinitions: [
 			{
-				AttributeName: 'BeanId',
+				AttributeName: 'beanId',
 				AttributeType: 'S',
 			},
 		],

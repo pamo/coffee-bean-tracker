@@ -12,7 +12,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
 		const deleteParams = {
 			TableName: process.env.TABLE_NAME!,
-			Key: { BeanId: beanId },
+			Key: { beanId },
 		};
 
 		await dynamoDb.delete(deleteParams);

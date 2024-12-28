@@ -18,18 +18,18 @@ describe('fetchSummary handler', () => {
 		(dynamoDb.scan as jest.Mock).mockResolvedValue({
 			Items: [
 				{
-					BeanId: '123',
-					Name: 'Test Bean',
-					Roaster: 'Test Roaster',
-					RoastDate: '2024-01-01',
-					DateAdded: '2024-01-01'
+					beanId: '123',
+					name: 'Test Bean',
+					roaster: 'Test Roaster',
+					roastDate: '2024-01-01',
+					dateAdded: '2024-01-01'
 				},
 				{
-					BeanId: '124',
-					Name: 'Another Bean',
-					Roaster: 'Another Roaster',
-					RoastDate: '2024-02-01',
-					DateAdded: '2024-02-01'
+					beanId: '124',
+					name: 'Another Bean',
+					roaster: 'Another Roaster',
+					roastDate: '2024-02-01',
+					dateAdded: '2024-02-01'
 				}
 			]
 		});
@@ -43,18 +43,18 @@ describe('fetchSummary handler', () => {
 			roasters: ['Test Roaster', 'Another Roaster'],
 			recentBeans: [
 				{
-					BeanId: '124',
-					Name: 'Another Bean',
-					Roaster: 'Another Roaster',
-					RoastDate: '2024-02-01',
-					DateAdded: '2024-02-01'
+					beanId: '124',
+					name: 'Another Bean',
+					roaster: 'Another Roaster',
+					roastDate: '2024-02-01',
+					dateAdded: '2024-02-01'
 				},
 				{
-					BeanId: '123',
-					Name: 'Test Bean',
-					Roaster: 'Test Roaster',
-					RoastDate: '2024-01-01',
-					DateAdded: '2024-01-01'
+					beanId: '123',
+					name: 'Test Bean',
+					roaster: 'Test Roaster',
+					roastDate: '2024-01-01',
+					dateAdded: '2024-01-01'
 				}
 			],
 			averageBeansPerMonth: 1

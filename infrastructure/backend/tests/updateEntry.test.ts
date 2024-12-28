@@ -23,10 +23,10 @@ describe('updateEntry handler', () => {
 
 		(dynamoDb.update as jest.Mock).mockResolvedValue({
 			Attributes: {
-				BeanId: '123',
-				Name: 'Updated Bean',
-				Roaster: 'Updated Roaster',
-				RoastDate: '2024-01-02',
+				beanId: '123',
+				name: 'Updated Bean',
+				roaster: 'Updated Roaster',
+				roastDate: '2024-01-02',
 			},
 		});
 
@@ -75,10 +75,10 @@ describe('updateEntry handler', () => {
 
 		(dynamoDb.update as jest.Mock).mockResolvedValue({
 			Attributes: {
-				BeanId: '123',
-				Name: 'Updated Bean',
-				Roaster: 'Original Roaster',
-				RoastDate: '2024-01-01',
+				beanId: '123',
+				name: 'Updated Bean',
+				roaster: 'Original Roaster',
+				roastDate: '2024-01-01',
 			},
 		});
 
@@ -88,10 +88,10 @@ describe('updateEntry handler', () => {
 		expect(dynamoDb.update).toHaveBeenCalled();
 		expect(JSON.parse(response?.body || '').message).toBe('Bean updated successfully!');
 		expect(JSON.parse(response?.body || '').updatedBean).toEqual({
-			BeanId: '123',
-			Name: 'Updated Bean',
-			Roaster: 'Original Roaster',
-			RoastDate: '2024-01-01',
+			beanId: '123',
+			name: 'Updated Bean',
+			roaster: 'Original Roaster',
+			roastDate: '2024-01-01',
 		});
 	});
 });

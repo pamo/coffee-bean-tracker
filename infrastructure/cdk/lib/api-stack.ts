@@ -13,7 +13,7 @@ export class ApiStack extends cdk.Stack {
 		// DynamoDB table
 		const coffeeTable = new dynamodb.Table(this, 'CoffeeDataTable', {
 			tableName: 'CoffeeBeans',
-			partitionKey: { name: 'BeanId', type: dynamodb.AttributeType.STRING },
+			partitionKey: { name: 'beanId', type: dynamodb.AttributeType.STRING },
 			billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
 			removalPolicy: cdk.RemovalPolicy.RETAIN, // Protect the table from accidental deletion
 		});

@@ -19,11 +19,11 @@ describe('fetchBeanDetails handler', () => {
 
 		(dynamoDb.get as jest.Mock).mockResolvedValue({
 			Item: {
-				BeanId: '123',
-				Name: 'Test Bean',
-				Roaster: 'Test Roaster',
-				RoastDate: '2024-01-01',
-				DateAdded: '2024-01-01'
+				beanId: '123',
+				name: 'Test Bean',
+				roaster: 'Test Roaster',
+				roastDate: '2024-01-01',
+				dateAdded: '2024-01-01'
 			}
 		});
 
@@ -32,11 +32,11 @@ describe('fetchBeanDetails handler', () => {
 		expect(response?.statusCode).toBe(200);
 		expect(dynamoDb.get).toHaveBeenCalled();
 		expect(JSON.parse(response?.body || '').bean).toEqual({
-			BeanId: '123',
-			Name: 'Test Bean',
-			Roaster: 'Test Roaster',
-			RoastDate: '2024-01-01',
-			DateAdded: '2024-01-01'
+			beanId: '123',
+			name: 'Test Bean',
+			roaster: 'Test Roaster',
+			roastDate: '2024-01-01',
+			dateAdded: '2024-01-01'
 		});
 	});
 

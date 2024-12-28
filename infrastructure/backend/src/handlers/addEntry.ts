@@ -26,11 +26,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 		}
 
 		const item: CoffeeBean = {
-			BeanId: `${Date.now()}`,
-			Name: data.name,
-			Roaster: data.roaster,
-			RoastDate: data.roastDate || undefined,
-			DateAdded: new Date().toISOString()
+			beanId: `${Date.now()}`,
+			name: data.name,
+			roaster: data.roaster,
+			roastDate: data.roastDate || undefined,
+			dateAdded: new Date().toISOString()
 		};
 
 		await dynamoDb.put({

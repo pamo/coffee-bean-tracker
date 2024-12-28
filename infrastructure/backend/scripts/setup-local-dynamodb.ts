@@ -14,10 +14,10 @@ const createTable = async () => {
     const command = new CreateTableCommand({
       TableName: 'CoffeeTable',
       KeySchema: [
-        { AttributeName: 'BeanId', KeyType: 'HASH' }
+        { AttributeName: 'beanId', KeyType: 'HASH' }
       ],
       AttributeDefinitions: [
-        { AttributeName: 'BeanId', AttributeType: 'S' }
+        { AttributeName: 'beanId', AttributeType: 'S' }
       ],
       ProvisionedThroughput: {
         ReadCapacityUnits: 5,
