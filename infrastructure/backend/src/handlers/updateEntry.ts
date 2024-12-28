@@ -19,7 +19,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 		const expressionAttributeNames: { [key: string]: string } = {};
 		const expressionAttributeValues: { [key: string]: any } = {};
 
-		const { name, roaster, roastDate } = data;
+		const { name, origin, roaster, roastDate, processingType } = data;
 		if (name) {
 			updateExpressions.push('#name = :name');
 			expressionAttributeNames['#name'] = 'Name';
@@ -38,14 +38,20 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 			expressionAttributeValues[':roastDate'] = data.roastDate;
 		}
 
-		if (updateExpressions.length === 0) {
-			return createResponse(400, { message: 'No valid fields to update' });
+		if (processingType) {
+			updateExpressions.push('#processingType = :processingType');
+			expressionAttributeNames['#processingType'] = 'processingType';
+			expressionAttributeValues[':processingType'] = processingType;
 		}
 
-		if (data.processingType) {
-			updateExpression.push('#processingType = :processingType');
-			expressionAttributeNames['#processingType'] = 'processingType';
-			expressionAttributeValues[':processingType'] = data.processingType;
+		if (origin) {
+			updateExpressions.push('#origin = :origin');
+			expressionAttributeNames['#origin'] = 'origin';
+			expressionAttributeValues[':origin'] = origin;
+		}
+
+		if (updateExpressions.length === 0) {
+			return createResponse(400, { message: 'No valid fields to update' });
 		}
 
 		const updateParams: UpdateCommandInput = {

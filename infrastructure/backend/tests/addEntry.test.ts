@@ -18,7 +18,9 @@ describe('addEntry handler', () => {
 		const event = createEvent({
 			name: 'Test Bean',
 			roaster: 'Test Roaster',
-			roastDate: '2024-01-01'
+			roastDate: '2024-01-01',
+			origin: 'Mars',
+			processingType: 'Washed'
 		});
 
 		(dynamoDb.put as jest.Mock).mockResolvedValue({});
@@ -34,7 +36,9 @@ describe('addEntry handler', () => {
 		const event = createEvent({
 			name: 'Test Bean',
 			roaster: 'Test Roaster',
-			roastDate: 'invalid-date'
+			roastDate: 'invalid-date',
+			origin: 'Mars',
+			processingType: 'Washed'
 		});
 
 		const response = await handler(event, {} as any, {} as any);

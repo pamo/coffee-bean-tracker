@@ -11,8 +11,8 @@ export class ApiStack extends cdk.Stack {
 		super(scope, id, props);
 
 		// DynamoDB table
-		const coffeeTable = new dynamodb.Table(this, 'CoffeeDataTable', {
-			tableName: 'CoffeeBeans',
+		const coffeeTable = new dynamodb.Table(this, process.env.TABLE_NAME!, {
+			tableName: process.env.TABLE_NAME!,
 			partitionKey: { name: 'beanId', type: dynamodb.AttributeType.STRING },
 			billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
 			removalPolicy: cdk.RemovalPolicy.RETAIN, // Protect the table from accidental deletion

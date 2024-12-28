@@ -4,49 +4,52 @@ import { dynamoDb, CoffeeBean } from '../utils/dynamodb';
 import { createResponse } from '../utils/apiResponses';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
-	try {
-		if (!event.body) {
-			return createResponse(400, { message: 'Missing request body' });
-		}
+  try {
+    if (!event.body) {
+      return createResponse(400, { message: 'Missing request body' });
+    }
 
-		const data = JSON.parse(event.body);
+    const data = JSON.parse(event.body);
+    const { name, origin, roaster, roastDate, processingType } = data;
 
-		// Validate required fields
-		if (!data.name || !data.roaster) {
-			return createResponse(400, {
-				message: 'Missing required fields: name and roaster are required'
-			});
-		}
+    // Validate required fields
+    if (!name || !roaster || !origin || !processingType) {
+      return createResponse(400, {
+        message: 'Missing required fields: name, roaster, origin, processingType are required',
+      });
+    }
 
-		// Validate roastDate if provided
-		if (data.roastDate && isNaN(Date.parse(data.roastDate))) {
-			return createResponse(400, {
-				message: 'Invalid roastDate format'
-			});
-		}
+    // Validate roastDate if provided
+    if (roastDate && isNaN(Date.parse(roastDate))) {
+      return createResponse(400, {
+        message: 'Invalid roastDate format',
+      });
+    }
 
-		const item: CoffeeBean = {
-			beanId: `${Date.now()}`,
-			name: data.name,
-			roaster: data.roaster,
-			roastDate: data.roastDate || undefined,
-			dateAdded: new Date().toISOString(),
-			processingType: data.processingType
-		};
+    const item: CoffeeBean = {
+      beanId: `${Date.now()}`,
+      name,
+      roaster,
+      origin,
+      roastDate,
+      dateAdded: new Date().toISOString(),
+      processingType: processingType,
+    };
 
-		await dynamoDb.put({
-			TableName: process.env.TABLE_NAME!,
-			Item: item
-		});
+    const params = {
+      TableName: process.env.TABLE_NAME!,
+      Item: item,
+    };
 
-		return createResponse(200, {
-			message: 'Bean added successfully!',
-			bean: item
-		});
-	} catch (error) {
-		console.error('Error adding bean:', error);
-		return createResponse(500, {
-			message: 'Error adding bean to database'
-		});
-	}
+    await dynamoDb.put(params);
+
+    return createResponse(200, {
+      message: 'Bean added successfully!',
+      bean: item,
+    });
+  } catch (error) {
+    return createResponse(500, {
+      message: 'Error adding bean to database',
+    });
+  }
 };

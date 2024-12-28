@@ -1,4 +1,4 @@
-import { DynamoDBClient, UpdateItemCommand, UpdateItemCommandInput } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
 	DynamoDBDocumentClient,
 	PutCommand,
@@ -31,6 +31,7 @@ export interface CoffeeBean {
 	beanId: string;
 	name: string;
 	roaster: string;
+	origin: string;
 	dateAdded: string;
 	processingType: string;
 	roastDate?: string;
