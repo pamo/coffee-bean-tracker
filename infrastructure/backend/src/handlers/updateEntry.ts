@@ -42,6 +42,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 			return createResponse(400, { message: 'No valid fields to update' });
 		}
 
+		if (data.processingType) {
+			updateExpression.push('#processingType = :processingType');
+			expressionAttributeNames['#processingType'] = 'processingType';
+			expressionAttributeValues[':processingType'] = data.processingType;
+		}
+
 		const updateParams: UpdateCommandInput = {
 			TableName: process.env.TABLE_NAME!,
 			Key: { beanId },

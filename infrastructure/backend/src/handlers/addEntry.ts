@@ -30,7 +30,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 			name: data.name,
 			roaster: data.roaster,
 			roastDate: data.roastDate || undefined,
-			dateAdded: new Date().toISOString()
+			dateAdded: new Date().toISOString(),
+			processingType: data.processingType
 		};
 
 		await dynamoDb.put({

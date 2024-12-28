@@ -31,8 +31,9 @@ export interface CoffeeBean {
 	beanId: string;
 	name: string;
 	roaster: string;
-	roastDate?: string;
 	dateAdded: string;
+	processingType: string;
+	roastDate?: string;
 }
 
 export const dynamoDb = {
