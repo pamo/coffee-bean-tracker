@@ -1,7 +1,7 @@
-// infrastructure/backend/src/handlers/addEntry.ts
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { dynamoDb, CoffeeBean } from '../utils/dynamodb';
 import { createResponse } from '../utils/apiResponses';
+import { randomUUID } from 'crypto';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -20,14 +20,18 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     // Validate roastDate if provided
-    if (roastDate && isNaN(Date.parse(roastDate))) {
-      return createResponse(400, {
-        message: 'Invalid roastDate format',
-      });
+    if (roastDate) {
+      const parsedRoastDate = Date.parse(roastDate);
+      if (isNaN(parsedRoastDate)) {
+        return createResponse(400, {
+          message: 'Invalid roastDate format',
+        });
+      }
     }
 
+    const beanId = randomUUID();
     const item: CoffeeBean = {
-      beanId: `${Date.now()}`,
+      beanId,
       name,
       roaster,
       origin,
@@ -44,12 +48,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     await dynamoDb.put(params);
 
     return createResponse(200, {
-      message: 'Bean added successfully!',
+      message: 'Coffee added successfully!',
       bean: item,
     });
   } catch (error) {
-    return createResponse(500, {
-      message: 'Error adding bean to database',
-    });
+    const message = 'Error adding new coffee';
+    if (error instanceof Error) {
+      return createResponse(500, { message }, error);
+    } else {
+      return createResponse(500, { message, error: String(error) });
+    }
   }
 };

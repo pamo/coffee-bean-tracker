@@ -12,7 +12,7 @@ const createTable = async () => {
 
   try {
     const command = new CreateTableCommand({
-      TableName: 'CoffeeTable',
+      TableName: process.env.TABLE_NAME!,
       KeySchema: [
         { AttributeName: 'beanId', KeyType: 'HASH' }
       ],

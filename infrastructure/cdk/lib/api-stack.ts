@@ -11,7 +11,7 @@ export class ApiStack extends cdk.Stack {
 		super(scope, id, props);
 
 		// DynamoDB table
-		const coffeeTable = new dynamodb.Table(this, process.env.TABLE_NAME!, {
+		const coffeeTable = new dynamodb.Table(this, 'CoffeeDataTable', {
 			tableName: process.env.TABLE_NAME!,
 			partitionKey: { name: 'beanId', type: dynamodb.AttributeType.STRING },
 			billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,

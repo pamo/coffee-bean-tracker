@@ -4,7 +4,7 @@ import { createResponse } from '../utils/apiResponses';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
 	try {
-		const beanId = event.pathParameters?.beanId;
+		const beanId = event.pathParameters?.beanId && String(event.pathParameters?.beanId);
 
 		if (!beanId) {
 			return createResponse(400, { message: 'Missing beanId in path parameters' });
@@ -15,7 +15,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 			Key: { beanId },
 		};
 
-		await dynamoDb.delete(deleteParams);
+		console.log(`Delete parameters: ${JSON.stringify(deleteParams)}`);
+		const result = await dynamoDb.delete(deleteParams);
+		console.log(`Delete result: ${JSON.stringify(result)}`);
 
 		return createResponse(200, { message: 'Bean deleted successfully!' });
 	} catch (error) {
